@@ -58,6 +58,12 @@ jobs:
           repository: ${{ env.GITOPS_REPO }}
           token: ${{ secrets.GITOPS_TOKEN }}
           path: zen-gitops
+      - name: Debug GitOps checkout
+        run: |
+          pwd
+          ls -la
+          ls -la zen-gitops
+          find zen-gitops/envs -type f
 
       - name: Update image tag — DEV
         env:
