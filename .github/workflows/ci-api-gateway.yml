@@ -57,15 +57,15 @@ jobs:
         with:
           repository: ${{ env.GITOPS_REPO }}
           token: ${{ secrets.GITOPS_TOKEN }}
-          path: _gitops
+          path: zen-gitops
 
       - name: Update image tag — DEV
         env:
           IMAGE_TAG: ${{ needs.build.outputs.image-tag }}
         run: |
           yq e ".image.tag = \"${IMAGE_TAG}\"" -i \
-            "_gitops/envs/dev/values-api-gateway.yaml"
-          cd _gitops
+            "zen-gitops/envs/dev/values-api-gateway.yaml"
+          cd zen-gitops
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add .
@@ -86,7 +86,7 @@ jobs:
         with:
           repository: ${{ env.GITOPS_REPO }}
           token: ${{ secrets.GITOPS_TOKEN }}
-          path: _gitops
+          path: zen-gitops
 
       - name: Create branch, commit, open PR
         env:
@@ -99,7 +99,7 @@ jobs:
           RUN_ID: ${{ github.run_id }}
           GITOPS_REPO_NAME: ${{ env.GITOPS_REPO }}
         run: |
-          VALUES="_gitops/envs/qa/values-api-gateway.yaml"
+          VALUES="zen-gitops/envs/qa/values-api-gateway.yaml"
           BRANCH="promote/qa/api-gateway/${IMAGE_TAG}"
 
           if [[ ! -f "$VALUES" ]]; then
@@ -107,7 +107,7 @@ jobs:
             exit 0
           fi
 
-          cd _gitops
+          cd zen-gitops
           git checkout -b "$BRANCH"
           yq e ".image.tag = \"${IMAGE_TAG}\"" -i "envs/qa/values-api-gateway.yaml"
           git config user.name  "github-actions[bot]"
