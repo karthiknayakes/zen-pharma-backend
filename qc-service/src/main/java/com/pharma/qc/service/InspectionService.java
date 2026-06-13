@@ -2,17 +2,20 @@ package com.pharma.qc.service;
 
 import com.pharma.qc.model.Inspection;
 import com.pharma.qc.repository.InspectionRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class InspectionService {
 
     private final InspectionRepository repository;
+
+    public InspectionService(InspectionRepository repository) {
+        this.repository = repository;
+    }
 
     public List<Inspection> findAll() {
         return repository.findAll();
@@ -20,7 +23,8 @@ public class InspectionService {
 
     public Inspection findById(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Inspection not found with id: " + id));
+                .orElseThrow(() ->
+                        new RuntimeException("Inspection not found with id: " + id));
     }
 
     public List<Inspection> findByBatchNumber(String batchNumber) {
@@ -28,7 +32,9 @@ public class InspectionService {
     }
 
     public List<Inspection> findByResult(String result) {
-        return repository.findByResult(Inspection.Result.valueOf(result.toUpperCase()));
+        return repository.findByResult(
+                Inspection.Result.valueOf(result.toUpperCase())
+        );
     }
 
     public Inspection create(Inspection inspection) {
@@ -37,11 +43,13 @@ public class InspectionService {
 
     public Inspection update(Long id, Inspection updated) {
         Inspection existing = findById(id);
+
         existing.setProductName(updated.getProductName());
         existing.setInspectionType(updated.getInspectionType());
         existing.setResult(updated.getResult());
         existing.setInspectorName(updated.getInspectorName());
         existing.setNotes(updated.getNotes());
+
         return repository.save(existing);
     }
 

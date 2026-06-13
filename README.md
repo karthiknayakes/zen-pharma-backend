@@ -1,6 +1,6 @@
 # zen-pharma-backend
 
-Spring Boot microservices monorepo for the Zen Pharma platform. Contains 7 backend services built with Java 17 and deployed to AWS EKS via GitOps (ArgoCD).
+Spring Boot microservices monorepo for the Zen Pharma platform. Contains 8 backend services built with Java 17 and deployed to AWS EKS via GitOps (ArgoCD).
 
 > **Companion repos:**
 > - [`zen-infra`](https://github.com/your-github-username/zen-infra) — Terraform for AWS infrastructure (EKS, RDS, ECR, IAM)
@@ -18,6 +18,7 @@ Spring Boot microservices monorepo for the Zen Pharma platform. Contains 7 backe
 | `drug-catalog-service` | Drug catalogue — search, categories, formulary | 8082 | PostgreSQL |
 | `inventory-service` | Stock levels, replenishment, batch tracking | 8083 | PostgreSQL |
 | `manufacturing-service` | Production orders and batch manufacturing | 8084 | PostgreSQL |
+| `qc-service` | Quality control inspections and batch approval | 8086 | No |
 | `supplier-service` | Supplier management and purchase orders | 8085 | PostgreSQL |
 | `notification-service` | Email/SMS notifications (Node.js 20 / Express) | 8086 | No |
 
@@ -39,6 +40,10 @@ zen-pharma-backend/
 │   └── ...
 ├── manufacturing-service/
 │   └── ...
+├── qc-service/
+│   ├── src/
+│   ├── pom.xml
+│   └── Dockerfile
 ├── notification-service/          ← Node.js (not Java)
 │   └── ...
 ├── supplier-service/
@@ -49,8 +54,8 @@ zen-pharma-backend/
         ├── _java-pr-check.yml     ← Reusable: lightweight PR check
         ├── _node-build.yml        ← Reusable: full Node.js CI pipeline
         ├── _node-pr-check.yml     ← Reusable: lightweight Node PR check
-        ├── ci-<service>.yml       ← Full build + DEV deploy + QA PR (7 files)
-        ├── ci-pr-<service>.yml    ← Feature branch check (7 files)
+        ├── ci-<service>.yml       ← Full build + DEV deploy + QA PR (8 files)
+        ├── ci-pr-<service>.yml    ← Feature branch check (8 files)
         └── promote-prod.yml       ← Manual PROD promotion trigger
 ```
 
