@@ -69,10 +69,12 @@ jobs:
       image_tag: ${{ steps.meta.outputs.image_tag }}
       registry:  ${{ steps.login-ecr.outputs.registry }}
 
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       # ── Checkout ────────────────────────────────────────────────────────────
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # ── Derive short-SHA image tag ───────────────────────────────────────────
       - name: Set image tag
@@ -107,7 +109,7 @@ jobs:
       # ── Initialize CodeQL tracer BEFORE Maven build ───────────────────────────
       # CodeQL instruments the Maven compilation to collect call-graph data.
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: java
           queries: security-extended
@@ -132,7 +134,7 @@ jobs:
 
       # ── CodeQL analysis (uses results from the instrumented Maven build above) ─
       - name: CodeQL — Analyze
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
         with:
           category: /language:java
 
@@ -181,7 +183,7 @@ jobs:
 
       # ── AWS credentials via OIDC (no long-lived keys) ─────────────────────────
       - name: Configure AWS credentials (OIDC)
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/pharma-dev-github-actions-role
           aws-region: ${{ inputs.aws-region }}
@@ -215,9 +217,19 @@ jobs:
           exit-code: '0'
           ignore-unfixed: true
 
+      - name: Check Trivy SARIF output
+        id: trivy-check
+        run: |
+          if [ -f trivy-results.sarif ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "trivy-results.sarif not found"
+          fi
+
       - name: Upload Trivy SARIF to GitHub Security tab
-        if: always()
-        uses: github/codeql-action/upload-sarif@v3
+        if: always() && steps.trivy-check.outputs.exists == 'true'
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: trivy-results.sarif
           category: trivy-${{ inputs.service-name }}
